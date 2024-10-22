@@ -5,6 +5,7 @@ import handleZodError from "../errors/handleZodError";
 import { ErrorRequestHandler } from "express";
 import { TErrorSources } from "../types";
 import handleValidationError from "../errors/handleValidatonError";
+import handleCastError from "../errors/handleCastError";
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   let statusCode = 500;
@@ -27,7 +28,13 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
+  } else if (err?.name === "CastError") {
+    const simplifiedError = handleCastError(err);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSources = simplifiedError?.errorSources;
   }
+
   return res.status(statusCode).json({
     success: false,
     message,
@@ -50,7 +57,7 @@ errorSources : [
 --------
 zod error
 
-error : [
+err : [
     issues : [
         {
             code : "invalid code",
@@ -66,7 +73,7 @@ error : [
 
 mongoose error
 
-error : [
+err : [
   errors : {
     name : {
       name : "validatorError",
@@ -83,5 +90,13 @@ error : [
   name : "ValidationError",
   message : "academic department validation failed name : path 'name' is required"
 ]
+
+cast error
+
+err : {
+  path : "_id",
+  name : "CastError",
+  message : "Cast to ObjectId for value"
+}
 
 */
