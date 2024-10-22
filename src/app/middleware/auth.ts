@@ -1,12 +1,10 @@
 import config from "../config";
 import AppError from "../errors/AppError";
+import { TUserRole } from "../modules/auth.interface";
 import catchAsync from "../utils/catchAsync";
 import jwt, { JwtPayload } from "jsonwebtoken";
-type TRole = {
-  user: string;
-  admin: string;
-};
-const auth = (...requiredRoles: TRole[]) => {
+
+const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req, res, next) => {
     const token = req.headers.authorization;
 
@@ -16,7 +14,7 @@ const auth = (...requiredRoles: TRole[]) => {
     jwt.verify(
       token,
       config.jwt_access_secret as string,
-      function (err: any, decoded) {
+      function (err, decoded) {
         if (err) {
           throw new AppError(401, "You are unauthorized");
         }
