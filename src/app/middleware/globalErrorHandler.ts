@@ -6,6 +6,7 @@ import { ErrorRequestHandler } from "express";
 import { TErrorSources } from "../types";
 import handleValidationError from "../errors/handleValidatonError";
 import handleCastError from "../errors/handleCastError";
+import handleDuplicationError from "../errors/handleDuplicateError";
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   let statusCode = 500;
@@ -30,6 +31,11 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     errorSources = simplifiedError?.errorSources;
   } else if (err?.name === "CastError") {
     const simplifiedError = handleCastError(err);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSources = simplifiedError?.errorSources;
+  } else if (err?.code === 11000) {
+    const simplifiedError = handleDuplicationError(err);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
@@ -97,6 +103,15 @@ err : {
   path : "_id",
   name : "CastError",
   message : "Cast to ObjectId for value"
+}
+
+duplicate error
+
+success : false,
+message : "E11000 duplicate key error collection : {name:\*Department of Computer Science and Engineering\*"
+err : {
+  index : 0,
+  code : 11000
 }
 
 */
