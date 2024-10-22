@@ -4,7 +4,7 @@ import { TErrorResponse, TErrorSources } from "../types";
 const handleZodError = (err: ZodError): TErrorResponse => {
   const errorSources: TErrorSources = err.issues.map((issue) => {
     return {
-      path: issue?.path[issue.path.length - 1],
+      path: issue?.path[issue?.path?.length - 1],
       message: issue?.message,
     };
   });
