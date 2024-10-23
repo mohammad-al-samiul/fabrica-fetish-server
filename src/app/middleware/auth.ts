@@ -1,6 +1,7 @@
 import config from "../config";
 import AppError from "../errors/AppError";
-import { TUserRole } from "../modules/auth.interface";
+import { TUserRole } from "../modules/auth/auth.interface";
+
 import catchAsync from "../utils/catchAsync";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
