@@ -6,7 +6,8 @@ import bcrypt from "bcrypt";
 import { USER_ROLE } from "./auth.constant";
 
 import { TJwtPayload } from "./auth.interface";
-import { createToken } from "./auth.utils";
+import { createToken, verifyToken } from "./auth.utils";
+import { profile } from "console";
 const loginUserIntoDB = async (payload: TLoginUser) => {
   const user = await User.findOne({ email: payload.email });
   if (!user) {
@@ -80,7 +81,34 @@ const registerUserIntoDB = async (payload: Partial<TUser>) => {
   return user;
 };
 
+const refreshTokenIntoDB = async (token: string) => {
+  const decoded = await verifyToken(token, config.jwt_refresh_secret as string);
+  const { email } = decoded as TJwtPayload;
+  const user = await User.findOne({ email: email });
+
+  if (!user) {
+    throw new AppError(404, "User not found!");
+  }
+
+  const jwtPayload: TJwtPayload = {
+    email: user.email,
+    role: user.role!,
+    profileImg: user.profileImg,
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_refresh_expires_in as string
+  );
+
+  return {
+    accessToken,
+  };
+};
+
 export const AuthServices = {
   registerUserIntoDB,
   loginUserIntoDB,
+  refreshTokenIntoDB,
 };
