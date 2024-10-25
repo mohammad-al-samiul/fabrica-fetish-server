@@ -4,8 +4,9 @@ import { TLoginUser, TUser } from "../user/user.interface";
 import { User } from "../user/user.model";
 import bcrypt from "bcrypt";
 import { USER_ROLE } from "./auth.constant";
-import createToken from "./auth.utils";
+
 import { TJwtPayload } from "./auth.interface";
+import { createToken } from "./auth.utils";
 const loginUserIntoDB = async (payload: TLoginUser) => {
   const user = await User.findOne({ email: payload.email });
   if (!user) {
