@@ -62,6 +62,8 @@ const loginUserIntoDB = async (payload: TLoginUser) => {
         config.jwt_refresh_expires_in as string
       );
 
+      //console.log({ accessToken, refreshToken });
+
       return {
         accessToken,
         refreshToken,

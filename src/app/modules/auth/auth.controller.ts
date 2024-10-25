@@ -1,3 +1,4 @@
+import config from "../../config";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { AuthServices } from "./auth.service";
@@ -18,6 +19,11 @@ const loginUser = catchAsync(async (req, res) => {
   const userInfo = req.body;
   const result = await AuthServices.loginUserIntoDB(userInfo);
   const { accessToken, refreshToken }: any = result;
+
+  res.cookie("refreshToken", refreshToken, {
+    secure: config.node_env === "production",
+    httpOnly: true,
+  });
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -31,6 +37,7 @@ const loginUser = catchAsync(async (req, res) => {
 
 const refreshToken = catchAsync(async (req, res) => {
   const { refreshToken } = req.cookies;
+  console.log("refreshToken", refreshToken);
   const result = await AuthServices.refreshTokenIntoDB(refreshToken);
   sendResponse(res, {
     statusCode: 201,
