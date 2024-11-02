@@ -3,7 +3,6 @@ import validateRequest from "../../middleware/validateRequest";
 import { AuthControllers } from "./auth.controller";
 import { AuthValidations } from "./auth.validation";
 import { multerUpload } from "../../config/multer.config";
-
 const authRouter = express.Router();
 
 authRouter.post(
@@ -14,6 +13,7 @@ authRouter.post(
     next();
   },
   validateRequest(AuthValidations.createUserValidationSchema),
+
   AuthControllers.registerUser
 );
 

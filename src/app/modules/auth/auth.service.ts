@@ -7,7 +7,7 @@ import { USER_ROLE } from "./auth.constant";
 
 import { TJwtPayload } from "./auth.interface";
 import { createToken, verifyToken } from "./auth.utils";
-import { profile } from "console";
+
 const loginUserIntoDB = async (payload: TLoginUser) => {
   const user = await User.findOne({ email: payload.email });
   if (!user) {
