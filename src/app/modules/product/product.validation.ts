@@ -30,9 +30,7 @@ const createProductValidationSchema = z.object({
     category: z.string({
       required_error: "Category is required",
     }),
-    image: z.string({
-      required_error: "Image URL is required",
-    }),
+    image: z.string().optional(),
     rating: ratingValidationSchema,
   }),
 });

@@ -4,10 +4,10 @@ import sendResponse from "../../utils/sendResponse";
 import { AuthServices } from "./auth.service";
 
 const registerUser = catchAsync(async (req, res) => {
-  const bikeInfo = req.body;
+  const userInfo = req.body;
   const file = req?.file;
-  bikeInfo.profileImg = file?.path;
-  const result = await AuthServices.registerUserIntoDB(bikeInfo);
+  userInfo.profileImg = file?.path;
+  const result = await AuthServices.registerUserIntoDB(userInfo);
 
   sendResponse(res, {
     statusCode: 201,

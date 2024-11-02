@@ -3,7 +3,11 @@ import sendResponse from "../../utils/sendResponse";
 import { ProductServices } from "./product.service";
 
 const createProduct = catchAsync(async (req, res) => {
-  const result = await ProductServices.createProductIntoDb(req.body);
+  const productInfo = req.body;
+  const file = req?.file;
+  productInfo.image = file?.path;
+  const result = await ProductServices.createProductIntoDb(productInfo);
+
   sendResponse(res, {
     statusCode: 201,
     success: true,
