@@ -13,31 +13,40 @@ const ratingSchema = new Schema<TRating>({
   },
 });
 
-const productSchema = new Schema<TProduct>({
-  title: {
-    type: String,
-    required: true,
+const productSchema = new Schema<TProduct>(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    quantity: {
+      type: Number,
+      required: true,
+    },
+    category: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String,
+    },
+    rating: {
+      type: ratingSchema,
+      required: true,
+    },
   },
-  price: {
-    type: Number,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  category: {
-    type: String,
-    required: true,
-  },
-  image: {
-    type: String,
-  },
-  rating: {
-    type: ratingSchema,
-    required: true,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 productSchema.pre("save", async function (next) {
   const isProductExist = await Product.findOne({ title: this?.title });

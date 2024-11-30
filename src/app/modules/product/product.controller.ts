@@ -17,7 +17,16 @@ const createProduct = catchAsync(async (req, res) => {
 });
 
 const getAllProduct = catchAsync(async (req, res) => {
-  const result = await ProductServices.getAllProductIntoDb();
+  const { category, sortBy, sortOrder, limit, page } = req.query;
+  const queryParams = {
+    category: category as string,
+    sortBy: sortBy as string,
+    sortOrder: sortOrder as "asc" | "desc",
+    limit: limit ? parseInt(limit as string, 10) : undefined,
+    page: page ? parseInt(page as string, 10) : undefined,
+  };
+
+  const result = await ProductServices.getAllProductIntoDb(queryParams);
   sendResponse(res, {
     success: true,
     statusCode: 200,

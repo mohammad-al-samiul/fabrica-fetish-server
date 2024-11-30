@@ -13,7 +13,6 @@ authRouter.post(
     next();
   },
   validateRequest(AuthValidations.createUserValidationSchema),
-
   AuthControllers.registerUser
 );
 

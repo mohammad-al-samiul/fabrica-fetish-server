@@ -4,6 +4,7 @@ export type TProduct = {
   description: string;
   category: string;
   image?: string;
+  quantity: number;
   rating: TRating;
 };
 

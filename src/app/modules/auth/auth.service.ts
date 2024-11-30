@@ -14,6 +14,7 @@ const loginUserIntoDB = async (payload: TLoginUser) => {
     const user = await registerUserIntoDB(payload);
 
     const jwtPayload: TJwtPayload = {
+      name: user?.name,
       email: user?.email,
       role: user?.role!,
       profileImg: user?.profileImg,
@@ -45,6 +46,7 @@ const loginUserIntoDB = async (payload: TLoginUser) => {
         throw new AppError(401, "Your password is incorrect!");
       }
       const jwtPayload: TJwtPayload = {
+        name: user?.name,
         email: user?.email,
         role: user?.role!,
         profileImg: user?.profileImg,
@@ -93,6 +95,7 @@ const refreshTokenIntoDB = async (token: string) => {
   }
 
   const jwtPayload: TJwtPayload = {
+    name: user?.name,
     email: user.email,
     role: user.role!,
     profileImg: user.profileImg,

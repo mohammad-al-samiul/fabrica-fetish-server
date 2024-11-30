@@ -17,7 +17,7 @@ const createUserValidationSchema = z.object({
       .min(6, "Password must be at least 6 characters"),
     phone: z.number().optional(),
     address: z.string().optional(),
-    role: z.enum(["admin", "user"]).default("user"),
+    role: z.enum(["admin", "user"]).default("user").optional(),
   }),
 });
 
