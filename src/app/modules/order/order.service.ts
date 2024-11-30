@@ -52,8 +52,17 @@ const getAllOrdersIntoDb = async () => {
   return result;
 };
 
-const getSingleOrderIntoDb = async (id: string) => {
-  const result = await Order.findById(id);
+const deleteOrderIntoDb = async (id: string) => {
+  const order = await Order.findOne({ _id: id });
+  if (!order) {
+    throw new Error("Order is not by this ID");
+  }
+  const result = await Order.findByIdAndDelete(
+    { _id: id },
+    {
+      lean: true,
+    }
+  );
   return result;
 };
 
@@ -110,5 +119,5 @@ const getSingleOrderIntoDb = async (id: string) => {
 export const OrderServices = {
   createOrderIntoDb,
   getAllOrdersIntoDb,
-  getSingleOrderIntoDb,
+  deleteOrderIntoDb,
 };

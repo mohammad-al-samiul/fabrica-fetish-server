@@ -14,7 +14,7 @@ orderRouter.post(
   OrderControllers.createOrder
 );
 
-orderRouter.get("/", OrderControllers.getAllOrders);
-orderRouter.get("/:id", OrderControllers.getSingleOrder);
+orderRouter.get("/", auth(USER_ROLE.user), OrderControllers.getAllOrders);
+orderRouter.delete("/:id", auth(USER_ROLE.user), OrderControllers.deleteOrder);
 
 export default orderRouter;

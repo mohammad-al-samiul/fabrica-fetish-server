@@ -26,13 +26,13 @@ const getAllOrders = catchAsync(async (req, res) => {
   });
 });
 
-const getSingleOrder = catchAsync(async (req, res) => {
-  const result = await OrderServices.getSingleOrderIntoDb(req.params.id);
+const deleteOrder = catchAsync(async (req, res) => {
+  const result = await OrderServices.deleteOrderIntoDb(req.params.id);
 
   sendResponse(res, {
     success: true,
     statusCode: 200,
-    message: "Order retrieved successfully!",
+    message: "Order deleted successfully!",
     data: result,
   });
 });
@@ -40,5 +40,5 @@ const getSingleOrder = catchAsync(async (req, res) => {
 export const OrderControllers = {
   createOrder,
   getAllOrders,
-  getSingleOrder,
+  deleteOrder,
 };
