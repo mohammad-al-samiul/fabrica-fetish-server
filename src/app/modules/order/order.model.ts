@@ -12,26 +12,34 @@ const ProductSchema = new Schema<IProduct>({
 });
 
 // Define Order Schema
-const OrderSchema = new Schema<IOrder>({
-  products: { type: [ProductSchema], required: true },
-  user: {
-    name: { type: String, required: true },
-    email: { type: String, required: true },
-    address: { type: String, required: true },
-    phone: { type: String, required: true },
-    postCode: { type: String, required: true },
+const OrderSchema = new Schema<IOrder>(
+  {
+    products: { type: [ProductSchema], required: true },
+    user: {
+      name: { type: String, required: true },
+      email: { type: String, required: true },
+      address: { type: String, required: true },
+      phone: { type: String, required: true },
+      postCode: { type: String, required: true },
+    },
+    transactionId: {
+      type: String,
+    },
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["unpaid", "paid"],
+      default: "unpaid",
+    },
+    date: { type: String, required: true },
   },
-  totalAmount: {
-    type: Number,
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: ["unpaid", "paid"],
-    default: "unpaid",
-  },
-  date: { type: String, required: true },
-});
+  {
+    timestamps: true,
+  }
+);
 
 // Create the Order Model
 export const Order: Model<IOrder> = mongoose.model<IOrder>(

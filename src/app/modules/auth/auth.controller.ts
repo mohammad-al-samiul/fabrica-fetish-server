@@ -49,8 +49,66 @@ const refreshToken = catchAsync(async (req, res) => {
   });
 });
 
+const getAllUser = catchAsync(async (req, res) => {
+  const result = await AuthServices.getAllUserFromDB();
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "User retrieved successfully!",
+    data: result,
+  });
+});
+
+const getProfile = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+  const result = await AuthServices.getProfileFromDB(token!);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "User profile retrieved successfully!",
+    data: result,
+  });
+});
+
+const updateProfile = catchAsync(async (req, res) => {
+  const updatedDoc = req.body;
+  const token = req.headers.authorization as string;
+  const result = await AuthServices.updateProfileFromDB(updatedDoc, token);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Profile updated successfully!",
+    data: result,
+  });
+});
+
+const deleteUser = catchAsync(async (req, res) => {
+  const result = await AuthServices.deleteUserFromDb(req.params.id);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Users deleted successfully!",
+    data: result,
+  });
+});
+
+const updateUserRole = catchAsync(async (req, res) => {
+  const result = await AuthServices.updateUserRole(req.params.id);
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Users role updated successfully!",
+    data: result,
+  });
+});
+
 export const AuthControllers = {
   registerUser,
   loginUser,
   refreshToken,
+  getAllUser,
+  getProfile,
+  updateProfile,
+  deleteUser,
+  updateUserRole,
 };

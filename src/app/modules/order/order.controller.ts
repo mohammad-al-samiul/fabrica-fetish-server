@@ -1,7 +1,8 @@
+import config from "../../config";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { OrderServices } from "./order.service";
-
+import jwt, { JwtPayload } from "jsonwebtoken";
 const createOrder = catchAsync(async (req, res) => {
   const orderInfo = req.body;
 
@@ -16,7 +17,13 @@ const createOrder = catchAsync(async (req, res) => {
 });
 
 const getAllOrders = catchAsync(async (req, res) => {
-  const result = await OrderServices.getAllOrdersIntoDb();
+  const token = req.headers.authorization as string;
+  const decoded = jwt.verify(
+    token,
+    config.jwt_access_secret as string
+  ) as JwtPayload;
+
+  const result = await OrderServices.getAllOrdersIntoDb(decoded);
 
   sendResponse(res, {
     success: true,

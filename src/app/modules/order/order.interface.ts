@@ -16,6 +16,7 @@ export interface IOrder {
     phone: string;
     postCode: string;
   };
+  transactionId?: string;
   totalAmount: number;
   status: "unpaid" | "paid";
   date: string;

@@ -4,9 +4,10 @@ import { TLoginUser, TUser } from "../user/user.interface";
 import { User } from "../user/user.model";
 import bcrypt from "bcrypt";
 import { USER_ROLE } from "./auth.constant";
-
+import jwt from "jsonwebtoken";
 import { TJwtPayload } from "./auth.interface";
 import { createToken, verifyToken } from "./auth.utils";
+import { JwtPayload } from "jsonwebtoken";
 
 const loginUserIntoDB = async (payload: TLoginUser) => {
   const user = await User.findOne({ email: payload.email });
@@ -112,8 +113,67 @@ const refreshTokenIntoDB = async (token: string) => {
   };
 };
 
+const getAllUserFromDB = async () => {
+  const result = await User.find();
+  return result;
+};
+
+//get user profile with access token
+const getProfileFromDB = async (token: string) => {
+  const { email, role } = jwt.verify(
+    token,
+    config.jwt_access_secret as string
+  ) as JwtPayload;
+  const user = await User.findOne({ email, role });
+  return user;
+};
+
+const updateProfileFromDB = async (payload: Partial<TUser>, token: string) => {
+  const { email, role } = jwt.verify(
+    token,
+    config.jwt_access_secret as string
+  ) as JwtPayload;
+  const isUserExist = await User.findOne({ email, role });
+  if (!isUserExist) {
+    throw new AppError(401, "You are not authorized");
+  }
+  const result = await User.findOneAndUpdate({ email, role }, payload, {
+    new: true,
+  }).select("-isDeleted -createdAt -updatedAt -__v");
+  return result;
+};
+
+const updateUserRole = async (id: string) => {
+  const user = await User.findById(id);
+  if (!user) {
+    throw new AppError(404, "Invalid user id");
+  }
+  let role;
+  if (user?.role === "user") {
+    role = "admin";
+  } else {
+    role = "user";
+  }
+  const result = await User.findByIdAndUpdate(id, { role });
+  return result;
+};
+
+const deleteUserFromDb = async (id: string) => {
+  const user = await User.findById(id);
+  if (!user) {
+    throw new AppError(404, "Invalid user id");
+  }
+  const result = await User.findByIdAndDelete(id);
+  return result;
+};
+
 export const AuthServices = {
   registerUserIntoDB,
   loginUserIntoDB,
   refreshTokenIntoDB,
+  getAllUserFromDB,
+  getProfileFromDB,
+  updateProfileFromDB,
+  updateUserRole,
+  deleteUserFromDb,
 };

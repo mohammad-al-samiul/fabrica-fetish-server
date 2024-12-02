@@ -3,6 +3,8 @@ import validateRequest from "../../middleware/validateRequest";
 import { AuthControllers } from "./auth.controller";
 import { AuthValidations } from "./auth.validation";
 import { multerUpload } from "../../config/multer.config";
+import auth from "../../middleware/auth";
+import { USER_ROLE } from "./auth.constant";
 const authRouter = express.Router();
 
 authRouter.post(
@@ -27,5 +29,19 @@ authRouter.post(
   validateRequest(AuthValidations.refreshTokenValidationSchema),
   AuthControllers.refreshToken
 );
+
+authRouter.get("/users", auth(USER_ROLE.admin), AuthControllers.getAllUser);
+
+authRouter.get("/me", AuthControllers.getProfile);
+
+authRouter.put(
+  "/me",
+  validateRequest(AuthValidations.updateUserValidationSchema),
+  AuthControllers.updateProfile
+);
+
+authRouter.delete("/:id", auth(USER_ROLE.admin), AuthControllers.deleteUser);
+
+authRouter.put("/:id", auth(USER_ROLE.admin), AuthControllers.updateUserRole);
 
 export default authRouter;

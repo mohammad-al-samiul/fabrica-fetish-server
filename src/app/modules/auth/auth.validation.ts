@@ -40,8 +40,15 @@ const loginUserValidationSchema = z.object({
   }),
 });
 
+const updateUserValidationSchema = z.object({
+  body: z.object({
+    name: z.string({ required_error: "Name is required!" }).optional(),
+    phone: z.number({ required_error: "Phone is required!" }).optional(),
+  }),
+});
 export const AuthValidations = {
   createUserValidationSchema,
   loginUserValidationSchema,
   refreshTokenValidationSchema,
+  updateUserValidationSchema,
 };

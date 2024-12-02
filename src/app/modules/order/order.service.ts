@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 import { IOrder } from "./order.interface";
 import { Order } from "./order.model";
 import { Product } from "../product/product.model";
+import { JwtPayload } from "jsonwebtoken";
+import { User } from "../user/user.model";
+import AppError from "../../errors/AppError";
 
 const createOrderIntoDb = async (payload: IOrder) => {
   const session = await mongoose.startSession();
@@ -47,15 +50,27 @@ const createOrderIntoDb = async (payload: IOrder) => {
   }
 };
 
-const getAllOrdersIntoDb = async () => {
-  const result = await Order.find();
+const getAllOrdersIntoDb = async (decodedInfo: JwtPayload) => {
+  const { email, role } = decodedInfo;
+  const user = await User.findOne({ email, role });
+  if (!user) {
+    throw new AppError(401, "User is not authorized!");
+  }
+
+  let result;
+  if (role === "admin") {
+    result = await Order.find();
+  } else {
+    result = await Order.find({ "user.email": email });
+  }
+
   return result;
 };
 
 const deleteOrderIntoDb = async (id: string) => {
   const order = await Order.findOne({ _id: id });
   if (!order) {
-    throw new Error("Order is not by this ID");
+    throw new Error("Order is not found by this ID");
   }
   const result = await Order.findByIdAndDelete(
     { _id: id },
