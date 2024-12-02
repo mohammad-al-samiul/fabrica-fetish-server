@@ -36,7 +36,13 @@ authRouter.get("/me", AuthControllers.getProfile);
 
 authRouter.put(
   "/me",
-  validateRequest(AuthValidations.updateUserValidationSchema),
+  multerUpload.single("image"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    console.log("req", req.body);
+    next();
+  },
+  //validateRequest(AuthValidations.updateUserValidationSchema),
   AuthControllers.updateProfile
 );
 

@@ -71,9 +71,14 @@ const getProfile = catchAsync(async (req, res) => {
 });
 
 const updateProfile = catchAsync(async (req, res) => {
-  const updatedDoc = req.body;
+  const userInfo = req.body;
+  const file = req?.file;
+  userInfo.profileImg = file?.path;
+
+  console.log(userInfo);
+
   const token = req.headers.authorization as string;
-  const result = await AuthServices.updateProfileFromDB(updatedDoc, token);
+  const result = await AuthServices.updateProfileFromDB(userInfo, token);
   sendResponse(res, {
     success: true,
     statusCode: 200,

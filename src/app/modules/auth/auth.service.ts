@@ -139,7 +139,7 @@ const updateProfileFromDB = async (payload: Partial<TUser>, token: string) => {
   }
   const result = await User.findOneAndUpdate({ email, role }, payload, {
     new: true,
-  }).select("-isDeleted -createdAt -updatedAt -__v");
+  }).select("-isDeleted -updatedAt -__v");
   return result;
 };
 
