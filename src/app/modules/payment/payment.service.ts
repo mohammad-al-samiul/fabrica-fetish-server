@@ -3,38 +3,29 @@ import config from "../../config";
 import { TPaymentProps } from "./payment.interface";
 import jwt from "jsonwebtoken";
 import { Payment } from "./payment.model";
-import { initiatePayment, verifyPayment } from "./payment.utils";
+
 import { v4 as uuidv4 } from "uuid";
-
-import { startSession } from "mongoose";
 import { Order } from "../order/order.model";
-import { User } from "../user/user.model";
+import { initiatePayment, verifyPayment } from "./payment.utils";
 
-const confirmationServiceIntoDB = async (
-  transactionId: string,
-  status: string
-) => {
-  const verifyResponse = await verifyPayment(transactionId);
+const confirmationServiceIntoDB = async (tnxId: string, status: string) => {
+  const verifyResponse = await verifyPayment(tnxId);
 
   if (verifyResponse && verifyResponse.pay_status === "Successful") {
     try {
-      const order = await Order.findOne({ transactionId });
+      const order = await Order.findOne({ tnxId });
 
       if (order) {
         const paymentData = {
-          transactionId,
+          tnxId,
           clientEmail: order?.user.email,
           amount: order?.totalAmount,
           orderId: order?._id,
         };
-        await Order.findOneAndUpdate(
-          { transactionId },
-          { paymentStatus: "paid" }
-        );
+        await Order.findOneAndUpdate({ tnxId }, { paymentStatus: "paid" });
 
         await Payment.create(paymentData);
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       throw new Error(error);
     }
@@ -194,52 +185,28 @@ const confirmationServiceIntoDB = async (
 };
 
 const createPaymentIntoDb = async (paymentData: TPaymentProps) => {
-  const session = await startSession();
-  session.startTransaction();
-
   try {
-    // Fetch user information
-    const user = await User.findOne({
-      email: paymentData?.clientEmail,
-    });
-    const userInfo = {
-      clientName: user?.name,
-      address: user?.address,
-      clientPhoneNo: user?.phone,
-    };
-
     // Generate transaction ID
-    const transactionId = `TXN-${uuidv4().split("-")[0]}`;
+    const tnxId = `TXN-${uuidv4().split("-")[0]}`;
 
     // Create payment info object
     const paymentInfo = {
-      transactionId,
+      tnxId,
       clientEmail: paymentData.clientEmail,
+      clientName: paymentData?.clientName,
       orderId: paymentData?.orderId,
-
+      clientPhoneNo: paymentData?.clientPhoneNo,
+      address: paymentData?.address,
       totalCost: paymentData.totalCost,
-      ...userInfo,
     };
-
-    // Update rental with transaction ID
-    await Order.findOneAndUpdate(
-      { _id: paymentData?.orderId, paymentStatus: "unpaid" },
-      { transactionId },
-      { session }
-    );
 
     // Initiate payment process (outside transaction as it might be an external API call)
     const paymentSession = await initiatePayment(paymentInfo);
-
-    // Commit transaction
-    await session.commitTransaction();
-    session.endSession();
+    console.log("url", paymentSession);
 
     return paymentSession;
-  } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    throw error;
+  } catch (error: any) {
+    throw new Error(error);
   }
 };
 

@@ -4,6 +4,7 @@ import globalErrorHandler from "./app/middleware/globalErrorHandler";
 import notFound from "./app/middleware/notFound";
 import router from "./app/routes";
 import cookieParser from "cookie-parser";
+import { paymentRouter } from "./app/modules/payment/payment.route";
 const app: Application = express();
 
 app.use(express.json());
@@ -17,6 +18,7 @@ app.use(
 app.use(cookieParser());
 
 app.use("/api/v1", router);
+app.use("/api/v1", paymentRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to Fabrica Fetish Api!");

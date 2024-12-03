@@ -7,8 +7,8 @@ export const initiatePayment = async (paymentData: TPaymentProps) => {
     const response = await axios.post(config.payment_url as string, {
       store_id: config.amarpay_store_id,
       signature_key: config.amarpay_signature_key,
-      tran_id: paymentData.transactionId,
-      success_url: `${config.backend_url}/api/confirmation?transactionId=${paymentData.transactionId}&status=success`,
+      tran_id: paymentData.tnxId,
+      success_url: `${config.backend_url}/api/confirmation?transactionId=${paymentData.tnxId}&status=success`,
       fail_url: `${config.backend_url}/api/confirmation?status=failed`,
       cancel_url: `${config.frontend_url}/user/my-orders`,
       amount: paymentData.totalCost,

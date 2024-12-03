@@ -1,18 +1,18 @@
 export type TPaymentProps = {
-  clientName: string | undefined;
-  address: string | null | undefined;
-  clientPhoneNo: number | null | undefined;
-  transactionId: string;
-  clientEmail: string | undefined;
+  clientName: string;
+  address: string;
+  clientPhoneNo: number;
+  tnxId: string;
+  clientEmail: string;
   orderId: string;
   totalCost: number;
-  _id?: string;
 };
 
-export type TPaymentInfo = {
-  transactionId: string;
-  clientEmail: string;
-  orderId?: string;
-  amount: string;
-  quantity?: number;
-};
+// export type TPaymentInfo = {
+//   transactionId: string;
+//   clientEmail: string;
+//   orderId?: string;
+//   amount: string;
+//   quantity?: number;
+//   clientId?: string;
+// };
