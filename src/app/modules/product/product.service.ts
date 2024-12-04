@@ -19,21 +19,19 @@ const getAllProductIntoDb = async (query: TProductQueryParams) => {
     category,
     sortBy = "createdAt",
     sortOrder = "asc",
-    // limit = 10,
+    limit = 20,
     // page = 1,
   } = query;
 
   // Build the filter based on the category if provided
   const filter = category ? { category } : {};
 
-  // Calculate pagination values
-  // const skip = (page - 1) * limit;
-
   // Execute the query with filter, sort, and pagination
-  const result = await Product.find(filter).sort({
-    [sortBy]: sortOrder === "asc" ? 1 : -1,
-  });
-  // .limit(limit);
+  const result = await Product.find(filter)
+    .sort({
+      [sortBy]: sortOrder === "asc" ? 1 : -1,
+    })
+    .limit(limit);
   // .skip(skip);
 
   return result;
