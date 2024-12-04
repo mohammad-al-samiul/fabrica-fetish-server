@@ -8,8 +8,8 @@ export const initiatePayment = async (paymentData: TPaymentProps) => {
       store_id: config.amarpay_store_id,
       signature_key: config.amarpay_signature_key,
       tran_id: paymentData.tnxId,
-      success_url: `${config.backend_url}/api/confirmation?transactionId=${paymentData.tnxId}&status=success`,
-      fail_url: `${config.backend_url}/api/confirmation?status=failed`,
+      success_url: `${config.backend_url}/confirmation?tnxId=${paymentData.tnxId}&status=success`,
+      fail_url: `${config.backend_url}/confirmation?status=failed`,
       cancel_url: `${config.frontend_url}/user/my-orders`,
       amount: paymentData.totalCost,
       currency: "BDT",
@@ -40,6 +40,7 @@ export const verifyPayment = async (tnxId: string) => {
         request_id: tnxId,
       },
     });
+
     return response.data;
   } catch (err) {
     throw new Error("Payment validation failed");

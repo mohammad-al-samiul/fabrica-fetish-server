@@ -1,12 +1,10 @@
-import { JwtPayload } from "jsonwebtoken";
-import config from "../../config";
 import { TPaymentProps } from "./payment.interface";
-import jwt from "jsonwebtoken";
 import { Payment } from "./payment.model";
-
 import { v4 as uuidv4 } from "uuid";
 import { Order } from "../order/order.model";
 import { initiatePayment, verifyPayment } from "./payment.utils";
+import { startSession } from "mongoose";
+import AppError from "../../errors/AppError";
 
 const confirmationServiceIntoDB = async (tnxId: string, status: string) => {
   const verifyResponse = await verifyPayment(tnxId);
@@ -14,18 +12,10 @@ const confirmationServiceIntoDB = async (tnxId: string, status: string) => {
   if (verifyResponse && verifyResponse.pay_status === "Successful") {
     try {
       const order = await Order.findOne({ tnxId });
-
-      if (order) {
-        const paymentData = {
-          tnxId,
-          clientEmail: order?.user.email,
-          amount: order?.totalAmount,
-          orderId: order?._id,
-        };
-        await Order.findOneAndUpdate({ tnxId }, { paymentStatus: "paid" });
-
-        await Payment.create(paymentData);
+      if (!order) {
+        throw new AppError(404, "Order not found!");
       }
+      await Order.findOneAndUpdate({ tnxId }, { status: "paid" });
     } catch (error: any) {
       throw new Error(error);
     }
@@ -185,6 +175,9 @@ const confirmationServiceIntoDB = async (tnxId: string, status: string) => {
 };
 
 const createPaymentIntoDb = async (paymentData: TPaymentProps) => {
+  const session = await startSession();
+  session.startTransaction();
+
   try {
     // Generate transaction ID
     const tnxId = `TXN-${uuidv4().split("-")[0]}`;
@@ -194,7 +187,6 @@ const createPaymentIntoDb = async (paymentData: TPaymentProps) => {
       tnxId,
       clientEmail: paymentData.clientEmail,
       clientName: paymentData?.clientName,
-      orderId: paymentData?.orderId,
       clientPhoneNo: paymentData?.clientPhoneNo,
       address: paymentData?.address,
       totalCost: paymentData.totalCost,
@@ -202,34 +194,26 @@ const createPaymentIntoDb = async (paymentData: TPaymentProps) => {
 
     // Initiate payment process (outside transaction as it might be an external API call)
     const paymentSession = await initiatePayment(paymentInfo);
-    console.log("url", paymentSession);
+
+    if (paymentSession.result) {
+      await Order.findOneAndUpdate(
+        { _id: paymentData?.orderId, status: "unpaid" },
+        { tnxId },
+        { session }
+      );
+    }
+    await session.commitTransaction();
+    session.endSession();
 
     return paymentSession;
   } catch (error: any) {
+    await session.abortTransaction();
+    session.endSession();
     throw new Error(error);
   }
-};
-
-const getAllPayment = async (token: string) => {
-  let result;
-  const decoded = jwt.verify(
-    token,
-    config.jwt_access_secret as string
-  ) as JwtPayload;
-
-  const { email, role } = decoded;
-
-  if (role === "user") {
-    result = await Payment.find({ clientEmail: email }); // Populate bikeId with the corresponding Bike details
-  } else {
-    result = await Payment.find(); // Populate bikeId for all payments
-  }
-
-  return result;
 };
 
 export const paymentServices = {
   confirmationServiceIntoDB,
   createPaymentIntoDb,
-  getAllPayment,
 };

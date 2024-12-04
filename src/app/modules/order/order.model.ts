@@ -22,7 +22,7 @@ const OrderSchema = new Schema<IOrder>(
       phone: { type: String, required: true },
       postCode: { type: String, required: true },
     },
-    transactionId: {
+    tnxId: {
       type: String,
     },
     totalAmount: {
