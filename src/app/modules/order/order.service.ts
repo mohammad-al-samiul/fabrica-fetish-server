@@ -30,13 +30,6 @@ const createOrderIntoDb = async (payload: IOrder) => {
       if (productInDb.quantity < product.quantity) {
         throw new Error(`Insufficient stock for product: ${product.title}`);
       }
-
-      // Update only the quantity field
-      await Product.updateOne(
-        { _id: product.productId },
-        { $inc: { quantity: -product.quantity } }, // Decrease quantity by the ordered amount
-        { session }
-      );
     }
 
     // Commit the transaction

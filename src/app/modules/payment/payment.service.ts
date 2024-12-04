@@ -3,21 +3,54 @@ import { Payment } from "./payment.model";
 import { v4 as uuidv4 } from "uuid";
 import { Order } from "../order/order.model";
 import { initiatePayment, verifyPayment } from "./payment.utils";
-import { startSession } from "mongoose";
+import mongoose, { startSession } from "mongoose";
 import AppError from "../../errors/AppError";
+import { Product } from "../product/product.model";
 
 const confirmationServiceIntoDB = async (tnxId: string, status: string) => {
   const verifyResponse = await verifyPayment(tnxId);
 
   if (verifyResponse && verifyResponse.pay_status === "Successful") {
+    const session = await mongoose.startSession();
     try {
-      const order = await Order.findOne({ tnxId });
+      session.startTransaction();
+
+      // Find the order by tnxId
+      const order = await Order.findOne({ tnxId }).session(session);
       if (!order) {
         throw new AppError(404, "Order not found!");
       }
-      await Order.findOneAndUpdate({ tnxId }, { status: "paid" });
+
+      // Iterate through the products in the order
+      for (const product of order.products) {
+        const productInDb = await Product.findOne({
+          _id: product.productId,
+        }).session(session);
+
+        // Check if the product exists
+        if (!productInDb) {
+          throw new Error(`Product not found: ${product.title}`);
+        }
+
+        // Update product quantity in the database (decrease by the ordered amount)
+        await Product.updateOne(
+          { _id: product.productId },
+          { $inc: { quantity: -product.quantity } },
+          { session }
+        );
+      }
+      // Update the order status to 'paid'
+      await Order.findOneAndUpdate({ tnxId }, { status: "paid" }, { session });
+
+      // Commit the transaction
+      await session.commitTransaction();
     } catch (error: any) {
+      // If any error occurs, abort the transaction
+      await session.abortTransaction();
       throw new Error(error);
+    } finally {
+      // End the session
+      session.endSession();
     }
   }
 
