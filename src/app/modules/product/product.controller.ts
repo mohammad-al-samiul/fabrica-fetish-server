@@ -47,9 +47,13 @@ const getSingleProduct = catchAsync(async (req, res) => {
 });
 
 const updateProduct = catchAsync(async (req, res) => {
+  const productInfo = req.body;
+  const file = req?.file;
+  productInfo.image = file?.path;
+
   const result = await ProductServices.updateProductIntoDb(
     req.params.id,
-    req.body
+    productInfo
   );
 
   sendResponse(res, {

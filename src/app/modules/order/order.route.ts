@@ -14,7 +14,11 @@ orderRouter.post(
   OrderControllers.createOrder
 );
 
-orderRouter.get("/", auth(USER_ROLE.user), OrderControllers.getAllOrders);
+orderRouter.get(
+  "/",
+  auth(USER_ROLE.admin, USER_ROLE.user),
+  OrderControllers.getAllOrders
+);
 orderRouter.delete("/:id", auth(USER_ROLE.user), OrderControllers.deleteOrder);
 
 export default orderRouter;

@@ -1,10 +1,11 @@
 import mongoose from "mongoose";
 import { IOrder } from "./order.interface";
 import { Order } from "./order.model";
-import { Product } from "../product/product.model";
+
 import { JwtPayload } from "jsonwebtoken";
 import { User } from "../user/user.model";
 import AppError from "../../errors/AppError";
+import { Product } from "../product/product.model";
 
 const createOrderIntoDb = async (payload: IOrder) => {
   const session = await mongoose.startSession();

@@ -1,5 +1,5 @@
 import { TPaymentProps } from "./payment.interface";
-import { Payment } from "./payment.model";
+
 import { v4 as uuidv4 } from "uuid";
 import { Order } from "../order/order.model";
 import { initiatePayment, verifyPayment } from "./payment.utils";
