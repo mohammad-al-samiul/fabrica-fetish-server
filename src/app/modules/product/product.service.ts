@@ -13,26 +13,26 @@ const createProductIntoDb = async (payload: TProduct) => {
   const result = await Product.create(payload);
   return result;
 };
-
 const getAllProductIntoDb = async (query: TProductQueryParams) => {
   const {
     category,
     sortBy = "createdAt",
     sortOrder = "asc",
     limit = 20,
-    // page = 1,
+    page = 1,
   } = query;
 
-  // Build the filter based on the category if provided
+  // Calculate the number of documents to skip for pagination
+  const skip = (page - 1) * limit;
+
   const filter = category ? { category } : {};
 
-  // Execute the query with filter, sort, and pagination
   const result = await Product.find(filter)
     .sort({
       [sortBy]: sortOrder === "asc" ? 1 : -1,
     })
-    .limit(limit);
-  // .skip(skip);
+    .limit(limit)
+    .skip(skip);
 
   return result;
 };
