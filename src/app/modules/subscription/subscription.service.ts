@@ -1,11 +1,10 @@
-import AppError from "../../errors/AppError";
-import { sendEmail } from "../../utils/subscribe.utils";
+import { sendEmail } from "./subscribe.utils";
 import { Subscription } from "./subscription.model";
 
 const subscribeUserToNewsletter = async (email: string) => {
   const isSubscribed = await Subscription.findOne({ email });
   if (isSubscribed) {
-    throw new AppError(400, "Email is already subscribed!");
+    throw new Error("Email is already subscribed!");
   }
 
   await sendEmail(
